@@ -35,4 +35,4 @@ jobs:
           destination_branch: main
           pr_title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
           pr_body: "This PR was triggered by a commit containing 'Raise PR'."
-          pr_reviewer: vndgithub
+          #pr_reviewer: vndgithub
