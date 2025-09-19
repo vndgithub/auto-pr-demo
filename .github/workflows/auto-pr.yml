@@ -3,7 +3,7 @@ name: Conditional Auto PR
 on:
   push:
     branches:
-      - feature/auto-pr #
+      - feature/auto-pr #test
 
 permissions:
   contents: write
