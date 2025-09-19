@@ -25,12 +25,11 @@ jobs:
 
       - name: Create Pull Request
         if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: feature/auto-pr
-          base: main
-          commit-message: ${{ steps.get_commit.outputs.commit_msg }}
+          source: feature/auto-pr
+          destination: main
           title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
           body: "This PR was triggered by a commit containing 'Raise PR'."
           reviewers: vndgithub
