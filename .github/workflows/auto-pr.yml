@@ -27,9 +27,9 @@ jobs:
         if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
         uses: repo-sync/pull-request@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          source: feature/auto-pr
-          destination: main
-          title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
-          body: "This PR was triggered by a commit containing 'Raise PR'."
-          reviewers: vndgithub
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: feature/auto-pr
+          destination_branch: main
+          pr_title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
+          pr_body: "This PR was triggered by a commit containing 'Raise PR'."
+          pr_reviewer: vndgithub
