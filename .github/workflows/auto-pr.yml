@@ -23,6 +23,9 @@ jobs:
           echo "Commit message: $COMMIT_MSG"
           echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
 
+      - name: Checkout source branch
+        run: git checkout feature/auto-pr
+
       - name: Create Pull Request
         if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
         uses: repo-sync/pull-request@v2
