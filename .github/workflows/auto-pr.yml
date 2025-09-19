@@ -3,7 +3,11 @@ name: Conditional Auto PR
 on:
   push:
     branches:
-      - feature  # Trigger only on pushes to 'feature' branch
+      - feature
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   check-commit-and-create-pr:
