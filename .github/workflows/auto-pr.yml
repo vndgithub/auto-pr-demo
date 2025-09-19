@@ -30,7 +30,7 @@ jobs:
         if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
         uses: repo-sync/pull-request@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}
           source_branch: feature/auto-pr
           destination_branch: main
           pr_title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
