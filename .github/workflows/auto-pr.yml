@@ -1,0 +1,32 @@
+name: Conditional Auto PR
+
+on:
+  push:
+    branches:
+      - feature  # Trigger only on pushes to 'feature' branch
+
+jobs:
+  check-commit-and-create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get latest commit message
+        id: get_commit
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+          echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          source: feature
+          destination: main
+          commit-message: ${{ steps.get_commit.outputs.commit_msg }}
+          title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
+          body: "This PR was triggered by a commit containing 'Raise PR'."
+          reviewers: vndgithub
