@@ -28,8 +28,8 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          source: feature
-          destination: main
+          branch: feature/auto-pr
+          base: main
           commit-message: ${{ steps.get_commit.outputs.commit_msg }}
           title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
           body: "This PR was triggered by a commit containing 'Raise PR'."
