@@ -1,4 +1,4 @@
-name: Conditional Auto PR VND
+name: Conditional Auto PR
 
 on:
   push:
