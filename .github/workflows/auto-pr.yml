@@ -3,7 +3,7 @@ name: Conditional Auto PR
 on:
   push:
     branches:
-      - 'feature/**'  # Matches any branch starting with 'feature/'
+      - 'feature/**'
 
 permissions:
   contents: write
@@ -25,7 +25,7 @@ jobs:
       - name: Get branch name
         id: get_branch
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Generate notes.txt from diff
@@ -35,7 +35,6 @@ jobs:
 
       - name: Run tests and save results
         run: |
-          echo "Running tests..."
           echo "✅ All tests passed!" > test-results.txt
           # Replace with actual test command if needed
 
@@ -44,27 +43,24 @@ jobs:
         run: |
           OVERVIEW="${{ steps.get_commit.outputs.commit_msg }}"
           CHANGES=$(cat notes.txt)
-          CHECKLIST=$(echo -e "- [x] Code compiles\n- [ ] Tests added\n- [ ] Docs updated")
+          CHECKLIST="- [x] Code compiles\n- [ ] Tests added\n- [ ] Docs updated"
           TEST_RESULTS=$(cat test-results.txt)
 
-          BODY=$(cat <<EOF
-### Overview
-$OVERVIEW
-
-### Change Notes
-$CHANGES
-
-### Checklist
-$CHECKLIST
-
-### Unit Test Results
-$TEST_RESULTS
-EOF
-)
-
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$BODY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo 'body<<EOF'
+            echo "### Overview"
+            echo "$OVERVIEW"
+            echo
+            echo "### Change Notes"
+            echo "$CHANGES"
+            echo
+            echo "### Checklist"
+            echo -e "$CHECKLIST"
+            echo
+            echo "### Unit Test Results"
+            echo "$TEST_RESULTS"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create Pull Request
         if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
