@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Ensures full commit history is
+          fetch-depth: 0  # Ensures full commit history
 
       - name: Get latest commit message
         id: get_commit
