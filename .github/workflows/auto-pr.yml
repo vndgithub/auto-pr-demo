@@ -3,7 +3,7 @@ name: Conditional Auto PR VND
 on:
   push:
     branches:
-      - 'feature/**'  # Matches any branch starting with 'feature/'
+      - 'feature/**'
 
 permissions:
   contents: write
