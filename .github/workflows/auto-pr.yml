@@ -3,7 +3,7 @@ name: Conditional Auto PR VND
 on:
   push:
     branches:
-      - feature/auto-pr
+      - 'feature/**'  # Matches any branch starting with 'feature/'
 
 permissions:
   contents: write
@@ -23,16 +23,32 @@ jobs:
           echo "Commit message: $COMMIT_MSG"
           echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
 
-      - name: Checkout source branch
-        run: git checkout feature/auto-pr
+      - name: Get branch name
+        id: get_branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          echo "Branch name: $BRANCH_NAME"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build PR Body
+        id: pr_body
+        run: |
+          OVERVIEW="${{ steps.get_commit.outputs.commit_msg }}"
+          CHANGES=$(cat notes.txt 2>/dev/null || echo "No change notes provided.")
+          CHECKLIST="- [x] Code compiles\n- [ ] Tests added\n- [ ] Docs updated"
+          TEST_RESULTS=$(cat test-results.txt 2>/dev/null || echo "No test results available.")
+
+          BODY="### Overview\n$OVERVIEW\n\n### Change Notes\n$CHANGES\n\n### Checklist\n$CHECKLIST\n\n### Unit Test Results\n$TEST_RESULTS"
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
         if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GH_PAT }}
-          source_branch: feature/auto-pr
+          source_branch: ${{ steps.get_branch.outputs.branch_name }}
           destination_branch: main
           pr_title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
-          pr_body: "This PR was triggered by a commit containing 'Raise PR'."
-          #pr_reviewer: vndgithub
+          pr_body: ${{ steps.pr_body.outputs.body }}
