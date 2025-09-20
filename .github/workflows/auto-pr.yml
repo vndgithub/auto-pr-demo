@@ -1,9 +1,49 @@
+# name: Conditional Auto PR
+
+# on:
+#   push:
+#     branches:
+#       - feature/auto-pr
+
+# permissions:
+#   contents: write
+#   pull-requests: write
+
+# jobs:
+#   check-commit-and-create-pr:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Get latest commit message
+#         id: get_commit
+#         run: |
+#           COMMIT_MSG=$(git log -1 --pretty=%B)
+#           echo "Commit message: $COMMIT_MSG"
+#           echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
+
+#       - name: Checkout source branch
+#         run: git checkout feature/auto-pr
+
+#       - name: Create Pull Request
+#         if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
+#         uses: repo-sync/pull-request@v2
+#         with:
+#           github_token: ${{ secrets.GH_PAT }}
+#           source_branch: feature/auto-pr
+#           destination_branch: main
+#           pr_title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
+#           pr_body: "This PR was triggered by a commit containing 'Raise PR'."
+#           #pr_reviewer: vndgithub
+
+
 name: Conditional Auto PR
 
 on:
   push:
     branches:
-      - feature/auto-pr
+      - 'feature/**'  # Matches any branch starting with 'feature/'
 
 permissions:
   contents: write
@@ -23,16 +63,19 @@ jobs:
           echo "Commit message: $COMMIT_MSG"
           echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
 
-      - name: Checkout source branch
-        run: git checkout feature/auto-pr
+      - name: Get branch name
+        id: get_branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          echo "Branch name: $BRANCH_NAME"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
         if: contains(steps.get_commit.outputs.commit_msg, 'Raise PR')
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GH_PAT }}
-          source_branch: feature/auto-pr
+          source_branch: ${{ steps.get_branch.outputs.branch_name }}
           destination_branch: main
           pr_title: "Automated PR: ${{ steps.get_commit.outputs.commit_msg }}"
           pr_body: "This PR was triggered by a commit containing 'Raise PR'."
-          #pr_reviewer: vndgithub
