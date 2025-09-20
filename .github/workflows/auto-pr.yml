@@ -28,10 +28,15 @@ jobs:
           BRANCH_NAME="${GITHUB_REF#refs/heads/}"
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-      - name: Generate notes.txt from diff
+      - name: Generate notes.txt safely
         run: |
-          git fetch origin main
-          git diff --name-only origin/main...HEAD > notes.txt
+          git fetch origin main || true
+          if git merge-base origin/main HEAD >/dev/null 2>&1; then
+            git diff --name-only origin/main...HEAD > notes.txt
+          else
+            echo "No merge base with main. Using last commit diff." > notes.txt
+            git diff --name-only HEAD~1 >> notes.txt
+          fi
 
       - name: Run tests and save results
         run: |
